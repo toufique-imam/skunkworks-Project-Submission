@@ -1,0 +1,9 @@
+<h2>My Heroes</h2>
+<ul class="users">
+    <li *ngFor="let user of users" 
+    [class.selected]="user === selectedUser"
+    (click)="onSelect(user)">
+        <span class="badge">{{user.id}}</span> {{user.fname}}
+    </li>
+</ul>
+<app-user-detail [user]="selectedUser"></app-user-detail>
