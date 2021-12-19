@@ -21,9 +21,9 @@ export class FormLoginComponent implements OnInit {
         console.log(response)
         var result = JSON.parse(JSON.stringify(response))
         if (result['result'] == 2) {
-          this.model = result['admin']
-          this.myStorage.setItem("ADMIN_ID", this.model.id.toString())
-          this.myStorage.setItem("ADMIN_KEY", this.model.pin.toString())
+          this.model = result['user']
+          this.myStorage.setItem("USER_ID", this.model.id.toString())
+          this.myStorage.setItem("USER_KEY", this.model.pin.toString())
           this.newItemEvent.emit(0);
         } else {
           this.newItemEvent.emit(1)

@@ -14,6 +14,8 @@ export class RestService {
   checkAdminUrl: string = this.rootApi + "/checkAdmin";
   loginUrl: string = this.rootApi + "/login";
   adminCheckUrl: string = this.rootApi + "/adminLoggedIn";
+  userCheck: string = this.rootApi + "/AuthenticateUser";
+  suiteCheck: string = this.rootApi + "/AccessSuite";
 
   constructor(private http: HttpClient) { }
 
@@ -34,5 +36,11 @@ export class RestService {
   }
   adminLoggedIn() {
     return this.http.get<boolean>(this.adminCheckUrl)
+  }
+  authenticateUser(user: User) {
+    return this.http.post(this.userCheck, JSON.stringify(user))
+  }
+  suiteAccess(user: User) {
+    return this.http.post<Number>(this.suiteCheck, JSON.stringify(user))
   }
 }

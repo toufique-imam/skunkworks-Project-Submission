@@ -6,8 +6,10 @@ import { SuiteCmpComponent } from './components/suite-cmp/suite-cmp.component';
 
 const routes: Routes = [
   { path: 'adminLogin', component: AdminPanelComponent, pathMatch: 'full' },
-  { path: 'suite', component: SuiteCmpComponent },
-  { path: '', component: StartPageComponent }
+  { path: 'suite/:id', component: SuiteCmpComponent },
+  { path: '', component: StartPageComponent },
+  { path: 'home', component: StartPageComponent },
+  { path: 'index', component: StartPageComponent }
 ];
 
 @NgModule({

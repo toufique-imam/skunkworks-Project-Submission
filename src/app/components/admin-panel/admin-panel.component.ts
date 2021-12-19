@@ -62,6 +62,12 @@ export class AdminPanelComponent implements OnInit {
   }
   loggedInTrigger(data: Number) {
     this.adminEntered = data == 0
+    if (this.adminEntered) {
+      this.myStorage.setItem("ADMIN_ID", this.myStorage.getItem("USER_ID")!)
+      this.myStorage.setItem("ADMIN_KEY", this.myStorage.getItem("USER_KEY")!)
+      this.myStorage.removeItem("USER_ID");
+      this.myStorage.removeItem("USER_KEY");
+    }
     console.log(this.adminEntered)
   }
 

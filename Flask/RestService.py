@@ -1,13 +1,9 @@
-from flask import Flask, json, jsonify, request, redirect, url_for, session
+from flask import Flask, json, jsonify, request, session
 from flask_cors import CORS
 
 import time
-from pymongo import MongoClient, ssl_support
+from pymongo import MongoClient
 # pprint library is used to make the output look more pretty
-from pprint import pprint
-import certifi
-import pymongo
-from random import randint
 
 '''
 Should move db code to other file
@@ -21,7 +17,7 @@ db = client.test
 
 
 def currentTime():
-    return time.time_ns()
+    return time.time()
 
 
 class User:
@@ -58,22 +54,28 @@ class User:
     def authenticate(self, id, pin):
         return (self.id == id and self.pin == pin)
 
-    def accessRoom(self, id, pin, room):
-        if(self.authenticate(id, pin)):
-            # user is exiting from the room
-            if(self.currentRoom == room):
-                self.roomExit[room] = currentTime()
-                self.totalTime = self.totalTime + \
-                    self.roomExit[room] - self.enterTime
+    def accessRoom(self, room):
+        print(room, self.currentRoom)
+        # user is exiting from the room
+        if(self.currentRoom == room):
+            self.roomExit[room] = currentTime()
+            self.totalTime = self.totalTime + \
+                self.roomExit[room] - self.enterTime
+            # reset
+            self.currentRoom = User.ROOM_NONE
+            print("first", self.currentRoom)
+            return 1
+        # user entering into a room
+        elif(self.currentRoom == User.ROOM_NONE):
+            self.enterTime = currentTime()
+            self.currentRoom = room
+            if(self.roomEnter[room] == -1):
+                self.roomEnter[room] = currentTime()
 
-                # reset
-                self.currentRoom = User.ROOM_NONE
-            # user entering into a room
-            elif(self.currentRoom == User.ROOM_NONE):
-                self.enterTime = currentTime()
-                self.currentRoom = room
-                if(self.roomEnter[room] == -1):
-                    self.roomEnter[room] = currentTime()
+            print("second", self.currentRoom)
+            return 0
+        else:
+            return -1
 
     def userUpdate(self):
         update = {}
@@ -90,14 +92,6 @@ USER_KEY = 'user'
 USER_ID_KEY = 'id'
 USER_PIN_KEY = 'pin'
 
-userLoggedIn = User()
-
-
-def countUsers():
-    find = {}
-    return db.users.count_documents(find)
-
-
 '''
  checks if the admin has been created
 '''
@@ -111,10 +105,6 @@ def adminActive():
 @app.route("/checkAdmin")
 def checkAdmin():
     return jsonify(adminActive())
-
-
-def getCurrentUser():
-    userLoggedIn.__dict__.update(session[USER_KEY])
 
 
 def checkLoggedIn():
@@ -133,6 +123,7 @@ def adminLoggedIn():
         return jsonify(True)
     return jsonify(False)
 
+
 '''
 login , only admin can login
 checks if user id , pin valid ,then checks for role
@@ -141,11 +132,9 @@ checks if user id , pin valid ,then checks for role
 
 @app.route("/login", methods=['POST'])
 def login():
-    data = (json.loads(request.get_data(parse_form_data=True)))
+    result = (json.loads(request.get_data(parse_form_data=True)))
 
-    print("DATA", data)
-
-    result = data
+    print("DATA", result)
 
     id = int(result['id'])
     pin = int(result['pin'])
@@ -159,20 +148,12 @@ def login():
         result = {"result": 1}
     else:
         print("logged in")
-        userLoggedIn.__dict__.update(userCheck)
-        userLoggedIn.__dict__.pop("_id")
-        session[USER_KEY] = userLoggedIn.__dict__
+        userloggedIn = getUserFromQuery(userCheck)
+        session[USER_KEY] = userloggedIn.__dict__
         print(session)
-        result = {"result": 2, "admin": userLoggedIn.__dict__}
+        result = {"result": 2, "user": userloggedIn.__dict__}
 
     return jsonify(result)
-
-
-@app.route("/logout", methods=['GET'])
-def logout():
-    userLoggedIn = User()
-    session.pop(USER_KEY)
-    return noUserPage()
 
 
 '''
@@ -182,6 +163,9 @@ get all user , only admin should access it
 
 @app.route("/getAllUser", methods=['GET'])
 def getAllUser():
+    '''
+    take id , password and check todo
+    '''
     # if checkLoggedIn() == False:
     #     return noUserPage()
 
@@ -192,10 +176,7 @@ def getAllUser():
     data = list(db.users.find(find))
     res = []
     for x in data:
-        user = User()
-        user.__dict__.update(x)
-        user.__dict__.pop('_id')
-        res.append(user.__dict__)
+        res.append(getUserFromQuery(x).__dict__)
 
     return jsonify(res)
 
@@ -212,16 +193,13 @@ adding user method , it should check if the admin is active , if yes , then chec
 
 @app.route("/AddUser", methods=['POST'])
 def AddUser():
-    # if checkLoggedIn() == False:
-    #     return noUserPage()
+    '''
+    take id , password and check todo
+    '''
+    result = (json.loads(request.get_data(parse_form_data=True)))
 
-    # if adminActive() == True and userLoggedIn.role != User.ROLE_ADMIN:
-    #     return noUserPage()
-    data = (json.loads(request.get_data(parse_form_data=True)))
+    print("DATA", result)
 
-    print("DATA", data)
-
-    result = data
     userNew = User()
 
     userNew.id = int(result['id'])
@@ -244,9 +222,6 @@ def AddUser():
     return jsonify(True)
 
 
-def noUserPage():
-    # todo
-    return False
 
 
 '''
@@ -267,6 +242,13 @@ def checkID():
     return jsonify(data != None)
 
 
+def getUserFromQuery(data):
+    userNow = User()
+    userNow.__dict__.update(data)
+    userNow.__dict__.pop('_id')
+    return userNow
+
+
 '''
 Check if the user can go through a door
 get the id , pin from form , and check
@@ -274,20 +256,44 @@ used loggedinUser for this
 '''
 
 
-@app.route("/AuthenticateUser", methods=['POST', 'GET'])
+@app.route("/AuthenticateUser", methods=['POST'])
 def authenticateUser():
-    if checkLoggedIn() == False:
-        return noUserPage()
 
-    if request.method == 'POST':
-        result = request.form
-        id = result['id']
-        pin = result['pin']
+    result = (json.loads(request.get_data(parse_form_data=True)))
+    print("DATA", result)
 
-        if(userLoggedIn.authenticate(id, pin)):
-            return jsonify(True)
-        else:
-            return jsonify(False)
+    id = int(result['id'])
+    pin = int(result['pin'])
+
+    data = findUser(id, pin)
+    if(data == None):
+        return jsonify({"result": -1})
+    userNow = getUserFromQuery(data)
+    print(json.dumps(userNow.__dict__))
+    return jsonify({"result": 0, "user": userNow.__dict__})
+
+
+@app.route("/AccessSuite", methods=['POST'])
+def accessSuite():
+
+    result = (json.loads(request.get_data(parse_form_data=True)))
+    print("DATA", result)
+
+    id = int(result['id'])
+    pin = int(result['pin'])
+    suite = int(result['currentRoom'])
+
+    data = findUser(id, pin)
+    if(data == None):
+        return jsonify(-2)
+    userNow = getUserFromQuery(data)
+    print(json.dumps(userNow.__dict__))
+
+    result = userNow.accessRoom(suite)
+    if(result != -1):
+        updaterUser(userNow)
+
+    return jsonify(result)
 
 
 '''
@@ -296,24 +302,17 @@ take the logged in user and update it
 '''
 
 
-@app.route("/UpdateUser", methods=['POST', 'GET'])
-def updaterUser():
-    if checkLoggedIn() == False:
-        return noUserPage()
+def updaterUser(user):
+    result = db.users.update_one(
+        {USER_ID_KEY: user.id}, {"$set": user.userUpdate()})
 
-    '''
-    check if userLoggedIn is valid
-    '''
-    if request.method == 'POST':
-        result = db.users.update_one(
-            {USER_ID_KEY: userLoggedIn.id}, {"$set": userLoggedIn.userUpdate()})
-
-        print('Number of documents modified : ' + str(result.modified_count))
+    print('Number of documents modified : ' + str(result.modified_count))
 
 
 @app.route("/", methods=['GET'])
 def index():
     return "Welcome to Employee Attendance System"
+
 
 app.secret_key = '000d88cd9d90036ebdd237eb6b0db000'
 if __name__ == '__main__':

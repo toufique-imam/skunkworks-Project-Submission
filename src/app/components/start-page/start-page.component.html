@@ -17,9 +17,10 @@
     </nav>
     <ul class="list-group list-group-flush">
         Enter Suite
-        <li class="list-group-item"><a routerLink="/suite" routerLinkActive="active">Suite 1</a></li>
-        <li class="list-group-item"><a routerLink="/suite" routerLinkActive="active">Suite 2</a></li>
-        <li class="list-group-item"><a routerLink="/suite" routerLinkActive="active">Suite 3</a></li>
+        <li class="list-group-item"><a [routerLink]="['/suite' , 1]" routerLinkActive="active">Suite 1</a></li>
+        <li class="list-group-item"><a [routerLink]="['/suite' , 2]" routerLinkActive="active">Suite 2</a></li>
+        <li class="list-group-item"><a [routerLink]="['/suite' , 3]" routerLinkActive="active">Suite 3</a></li>
+
     </ul>
 </div>
 <app-create-user *ngIf="hasAdmin" (newItemEvent)="checkAdmin()"></app-create-user>

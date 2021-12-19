@@ -1,20 +1,20 @@
 export class User {
-    id: Number;
+    id: number;
     fname: string;
     lname: string;
     designation: string;
     address: string;
     phone: number;
     email: string;
-    pin: Number
-    role: Number
+    pin: number
+    role: number
     //update - able
-    roomEnter: Array<Number>
-    roomExit: Array<Number>
+    roomEnter: Array<number>
+    roomExit: Array<number>
 
-    currentRoom: Number
-    enterTime: Number
-    totalTime: Number
+    currentRoom: number
+    enterTime: number
+    totalTime: number
     constructor() {
         this.id = 1;
         this.fname = "testF";
