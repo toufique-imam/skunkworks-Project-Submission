@@ -1,0 +1,10 @@
+{{ adminEntered }}
+<div class="container">
+    <app-form-login *ngIf="!adminEntered" (newItemEvent)="loggedInTrigger($event)"></app-form-login>
+</div>
+<div class="container" *ngIf="adminEntered">
+    <button *ngIf="!addUserClicked" class="btn btn-success"  (click)="addUserClick()">Add User</button>
+    <app-create-user *ngIf="addUserClicked" (newItemEvent)="submitClicked($event)"></app-create-user>
+    <button *ngIf="addUserClicked" class="btn btn-danger" (click)="addUserClick()">Cancel</button>
+    <app-users [dataChanging]="dataChanged"></app-users>
+</div>

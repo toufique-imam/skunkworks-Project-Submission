@@ -1,0 +1,78 @@
+<div class="container">
+    <h1>Add User</h1>
+    <form (ngSubmit)="onSubmit(userForm)" #userForm="ngForm">
+        <div class="form-group">
+            <label for="id">Employee Id</label>
+            <input type="number" class="form-control" id="id" required [(ngModel)]="model.id" name="id" #id="ngModel">
+            <div [hidden]="id.valid" class="alert alert-danger">
+                ID not valid
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label for="fname">First Name</label>
+            <input type="text" class="form-control" id="fname" required [(ngModel)]="model.fname" name="fname"
+                #fname="ngModel">
+            <div [hidden]="fname.valid || fname.pristine" class="alert alert-danger">
+                First Name is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="lname">Last Name</label>
+            <input type="text" class="form-control" id="lname" required [(ngModel)]="model.lname" name="lname"
+                #lname="ngModel">
+            <div [hidden]="lname.valid || lname.pristine" class="alert alert-danger">
+                Last Name is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="designation">Designation</label>
+            <input type="text" class="form-control" id="designation" required [(ngModel)]="model.designation"
+                name="designation" #designation="ngModel">
+            <div [hidden]="designation.valid || designation.pristine" class="alert alert-danger">
+                Designation is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" class="form-control" id="address" required [(ngModel)]="model.address" name="address"
+                #address="ngModel">
+            <div [hidden]="address.valid || address.pristine" class="alert alert-danger">
+                Address is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="number" class="form-control" id="phone" required [(ngModel)]="model.phone" name="phone"
+                #phone="ngModel">
+            <div [hidden]="phone.valid || phone.pristine" class="alert alert-danger">
+                Phone is required
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email"
+                #email="ngModel">
+            <div [hidden]="email.valid || email.pristine" class="alert alert-danger">
+                Email is required
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label for="pin">PIN</label>
+            <input type="password" class="form-control" id="pin" required [(ngModel)]="model.pin" name="pin"
+                #pin="ngModel">
+            <div [hidden]="pin.valid || pin.pristine" class="alert alert-danger">
+                Pin Code is required
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success" [disabled]="!userForm.form.valid">Submit</button>
+        <button type="button" class="btn btn-danger" (click)="newUser(); userForm.reset()">Clear form</button>
+    </form>
+</div>

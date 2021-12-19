@@ -1,0 +1,31 @@
+<div *ngIf="user">
+
+    <h2>{{user.fname | uppercase}} Details</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"> {{user.fname }} {{user.lname }}</h5>
+
+            <h6 class="card-subtitle mb-2 text-muted">Id : {{user.id}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">Total Time : {{user.totalTime}}</h6>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Designation: {{user.designation}}</li>
+                <li class="list-group-item">Address: {{user.address}}</li>
+                <li class="list-group-item">Phone: {{user.phone}}</li>
+                <li class="list-group-item">email: {{user.email}}</li>
+                <li class="list-group-item">pin: {{user.pin}}</li>
+            </ul>
+            <ul class="list-group list-group-flush">
+                First Enter time of rooms
+                <li class="list-group-item" *ngFor="let enter of user.roomEnter">{{enter}}</li>
+            </ul>
+
+            <ul class="list-group list-group-flush">
+                Last Exit time of room
+                <li class="list-group-item" *ngFor="let exit of user.roomExit">{{exit}}</li>
+            </ul>
+
+        </div>
+    </div>
+
+</div>

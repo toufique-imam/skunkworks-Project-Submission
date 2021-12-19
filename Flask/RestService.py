@@ -98,8 +98,19 @@ def countUsers():
     return db.users.count_documents(find)
 
 
+'''
+ checks if the admin has been created
+'''
+
+
 def adminActive():
-    return jsonify(countUsers() > 0)
+    find = {"role": User.ROLE_ADMIN}
+    return db.users.find_one(find) != None
+
+
+@app.route("/checkAdmin")
+def checkAdmin():
+    return jsonify(adminActive())
 
 
 def getCurrentUser():
@@ -115,22 +126,49 @@ def findUser(id, pin):
     return (db.users.find_one(find))
 
 
+@app.route("/adminLoggedIn")
+def adminLoggedIn():
+    print(session)
+    if(USER_KEY in session):
+        return jsonify(True)
+    return jsonify(False)
+
+'''
+login , only admin can login
+checks if user id , pin valid ,then checks for role
+'''
+
+
 @app.route("/login", methods=['POST'])
 def login():
-    if request.method == 'POST':
-        result = request.form
-        id = result[USER_ID_KEY]
-        pin = result[USER_PIN_KEY]
-        userCheck = findUser(id, pin)
-        if(userCheck == None):
-            return "error no user found"
-        else:
-            userLoggedIn.__dict__.update(userCheck)
-            userLoggedIn.__dict__.pop("_id")
-            session[USER_KEY] = userLoggedIn.__dict__
+    data = (json.loads(request.get_data(parse_form_data=True)))
+
+    print("DATA", data)
+
+    result = data
+
+    id = int(result['id'])
+    pin = int(result['pin'])
+    userCheck = findUser(id, pin)
+    result = None
+    if(userCheck == None):
+        print("user not found")
+        result = {"result": 0}
+    elif(userCheck["role"] != User.ROLE_ADMIN):
+        print("not admin")
+        result = {"result": 1}
+    else:
+        print("logged in")
+        userLoggedIn.__dict__.update(userCheck)
+        userLoggedIn.__dict__.pop("_id")
+        session[USER_KEY] = userLoggedIn.__dict__
+        print(session)
+        result = {"result": 2, "admin": userLoggedIn.__dict__}
+
+    return jsonify(result)
 
 
-@app.route("/login", methods=['GET'])
+@app.route("/logout", methods=['GET'])
 def logout():
     userLoggedIn = User()
     session.pop(USER_KEY)
@@ -144,17 +182,17 @@ get all user , only admin should access it
 
 @app.route("/getAllUser", methods=['GET'])
 def getAllUser():
-    if checkLoggedIn() == False:
-        return noUserPage()
+    # if checkLoggedIn() == False:
+    #     return noUserPage()
 
-    if(userLoggedIn.role != User.ROLE_ADMIN):
-        return noUserPage()
+    # if(userLoggedIn.role != User.ROLE_ADMIN):
+    #     return noUserPage()
 
     find = {"role": User.ROLE_USER}
     data = list(db.users.find(find))
     res = []
-    user = User()
     for x in data:
+        user = User()
         user.__dict__.update(x)
         user.__dict__.pop('_id')
         res.append(user.__dict__)
@@ -172,38 +210,61 @@ adding user method , it should check if the admin is active , if yes , then chec
 '''
 
 
-@app.route("/AddUser", methods=['POST', 'GET'])
+@app.route("/AddUser", methods=['POST'])
 def AddUser():
-    if checkLoggedIn() == False:
-        return noUserPage()
+    # if checkLoggedIn() == False:
+    #     return noUserPage()
 
-    if adminActive() == True and userLoggedIn.role != User.ROLE_ADMIN:
-        return noUserPage()
+    # if adminActive() == True and userLoggedIn.role != User.ROLE_ADMIN:
+    #     return noUserPage()
+    data = (json.loads(request.get_data(parse_form_data=True)))
 
-    if request.method == 'POST':
-        result = request.form
-        userNew = User()
-        userNew.id = result['id']
-        userNew.address = result['address']
-        userNew.designation = result['designation']
-        userNew.email = result['email']
-        userNew.fname = result['fname']
-        userNew.lname = result['lname']
-        userNew.phone = result['phone']
-        userNew.pin = result['pin']
+    print("DATA", data)
 
-        if(adminActive()):
-            userNew.role = User.ROLE_USER
-        else:
-            userNew.role = User.ROLE_ADMIN
-        addUser(userNew)
-        # todo
-        return
+    result = data
+    userNew = User()
+
+    userNew.id = int(result['id'])
+    userNew.address = result['address']
+    userNew.designation = result['designation']
+    userNew.email = result['email']
+    userNew.fname = result['fname']
+    userNew.lname = result['lname']
+    userNew.phone = int(result['phone'])
+    userNew.pin = int(result['pin'])
+
+    if(userNew.id == None or userNew.pin == None):
+        return jsonify(False)
+    if(adminActive()):
+        userNew.role = User.ROLE_USER
+    else:
+        userNew.role = User.ROLE_ADMIN
+    addUser(userNew)
+    # todo
+    return jsonify(True)
 
 
 def noUserPage():
     # todo
     return False
+
+
+'''
+Check if the inputID is already there 
+'''
+
+
+@app.route("/checkID")
+def checkID():
+    # if checkLoggedIn() == False:
+    #     return noUserPage()
+
+    id = request.args.get(USER_ID_KEY)
+    print("ARGS", id)
+
+    find = {"id": int(id)}
+    data = (db.users.find_one(find))
+    return jsonify(data != None)
 
 
 '''
@@ -254,6 +315,6 @@ def updaterUser():
 def index():
     return "Welcome to Employee Attendance System"
 
-
+app.secret_key = '000d88cd9d90036ebdd237eb6b0db000'
 if __name__ == '__main__':
     app.run(debug=True)

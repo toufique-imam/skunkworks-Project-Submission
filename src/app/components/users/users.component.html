@@ -1,0 +1,26 @@
+<h2>Employees</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Designation</th>
+            <th scope="col">Phone</th>
+            <th scope="col">email</th>
+            <th scope="col">pin</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let user of users" [class.selected]="user === selectedUser" (click)="onSelect(user)">
+            <th scope="row">{{user.id}}</th>
+            <td>{{user.fname}}</td>
+            <td>{{user.lname}}</td>
+            <td>{{user.designation}}</td>
+            <td>{{user.phone}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.pin}}</td>
+    </tbody>
+</table>
+
+<app-user-detail [user]="selectedUser"></app-user-detail>
