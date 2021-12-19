@@ -1,27 +1,25 @@
-# AngularTourOfHeroes
+## Setup
+- goto `Flask\RestService.py` and edit your mongodb Client url `(line 15)`
+```py
+client = MongoClient("<PUT YOUR MONGODB URL HERE>")
+#other configs for mongodb
+```
+- open a terminal , navigate to `Flask\` and run `python RestService.py`
+- open another termial , navigate to Root folder 
+- Run `npm install`
+- Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. 
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.1.2.
+## Website navigations
+### When first time , website will ask for Admin Account Signup 
+![Admin Signup first time](Images\adminLogin.png "Admin Signup first time")
 
-## Development server
+### After signed up from admin login section can add user / view current users
+![Admin Panel 1](Images\adminPanel1.png "Admin Panel 1")
+![Admin Panel 2](Images\adminPanel2.png "Admin Panel 2")
+![Admin Panel 3](Images\adminPanel3.png "Admin Panel 3")
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Access suite from homepages
+![suite access](Images\suiteAccess1.png "Suite Access")
+![suite enter](Images\suiteEnter1.png "Suite Enter")
+![suite cant access](Images\suiteCantAccess.png "Suite Cant Access")
+![suite Exit](Images\suiteexit1.png "Suite exit")
