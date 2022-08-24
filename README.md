@@ -1,3 +1,15 @@
+# Project showcasing Python+AngularJS usecases
+
+[Iftekher Toufique Imam](https://www.github.com/toufique-imam)
+
+---
+
+[![GitHub Stars](https://img.shields.io/github/stars/toufique-imam/skunkworks-Project-Submission?style=social)](https://github.com/caojiezhang/DAVSR)
+[![download](https://img.shields.io/github/downloads/toufique-imam/skunkworks-Project-Submission/total.svg)](https://github.com/caojiezhang/DAVSR/releases)
+![visitors](https://visitor-badge.glitch.me/badge?page_id=toufique-imam/skunkworks-Project-Submission)
+
+---
+
 ## Setup
 - goto `Flask\RestService.py` and edit your mongodb Client url `(line 15)`
 ```py
